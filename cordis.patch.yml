@@ -1,0 +1,3 @@
+- insert:
+    - id: signal-figure-studio
+      name: '@local/dsh-signal-figure-studio'

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Signal figure studio",
+    "description": "Turn repeated-run signal logs into paper figures: pick the figure type, tune layout and palette on a live preview, iterate versions, and roll back."
+  }
+}

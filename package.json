@@ -1,0 +1,58 @@
+{
+  "name": "@local/dsh-signal-figure-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "DeepSeek Harness plugin: turn repeated-run signal experiments into publication figures, tune layout and palette live, and roll versions back.",
+  "license": "MIT",
+  "author": "jiesudd",
+  "homepage": "https://github.com/jiesudd/dsh-signal-figure-studio#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jiesudd/dsh-signal-figure-studio.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jiesudd/dsh-signal-figure-studio/issues"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh-plugin",
+    "signal-processing",
+    "scientific-figures",
+    "paper-figures",
+    "reproducible-research"
+  ],
+  "scripts": {
+    "test": "node test/smoke.mjs"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "lib/*.js",
+    "locale/*.json",
+    "icon.svg",
+    "examples/*.svg",
+    "README.md",
+    "README.zh.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}
