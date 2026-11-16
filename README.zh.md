@@ -41,29 +41,72 @@
 
 ## 安装
 
-### 从本地检出安装
+三种方式任选其一，安装的都是同一个 bundle，都进入你当前的 profile。
 
-```bash
-git clone https://github.com/jiesudd/dsh-signal-figure-studio.git
-```
+### 1. 插件页面（不用命令行）
 
-在 Harness 会话中让 agent 执行：
+1. 在 DSH 网页侧边栏打开 **Plugins（插件）**。
+2. 点击 **Add plugin（添加插件）**。
+3. 在包名输入框粘贴：
 
-```
-plugin_manager { action: "install_bundle", target: "<检出的绝对路径>" }
-```
+   ```
+   github:jiesudd/dsh-signal-figure-studio
+   ```
 
-插件会以链接方式装入当前 profile，之后修改源码并重载插件即可生效。
+   或者完整的仓库地址：
 
-### 从 GitHub 安装
+   ```
+   https://github.com/jiesudd/dsh-signal-figure-studio
+   ```
+
+4. 点击 **Install（安装）**。对话框会先读取该 spec，再运行 pnpm 并显示输出。
+5. 完成后点击 **Enable now（立即启用）**。
+6. 若页面此前已打开，刷新一次，侧边栏面板区就会出现 **信号实验图工作台**。
+
+安装前管理器会先对 GitHub 执行 `git ls-remote` 检查，所以 **`PATH` 中必须有 Git**；没有 Git 会在这个检查处
+失败，而不是在下载时失败。
+
+### 2. 让 agent 安装
 
 ```
 plugin_manager { action: "install_bundle", target: "github:jiesudd/dsh-signal-figure-studio" }
 ```
 
-管理器会先用 `git ls-remote` 检查仓库，因此需要 `PATH` 中有 Git。
+### 3. 从本地检出安装（开发用）
 
-安装后在侧边栏面板区点击 **信号实验图工作台**；若页面在安装前就已打开，刷新一次。
+```bash
+git clone https://github.com/jiesudd/dsh-signal-figure-studio.git
+```
+
+然后在 Harness 会话中让 agent 执行：
+
+```
+plugin_manager { action: "install_bundle", target: "<检出的绝对路径>" }
+```
+
+插件会以**链接**方式装入 profile，之后修改源码并重载插件即可生效。这条路径除了 clone 本身之外不需要
+`git ls-remote` 检查。
+
+### 环境要求
+
+| 要求 | 原因 |
+| --- | --- |
+| 已安装的 DSH（Desktop 或 `dsh web`）且有可用 profile | bundle 装进 profile |
+| Node.js ≥ 20 | DSH 运行时自带 |
+| `PATH` 中有 Git | 仅 GitHub 路径需要（用于 `git ls-remote` 预检） |
+| 无其他依赖 | 本插件没有依赖，也不跑安装脚本 |
+
+### GitHub 路径失败时
+
+| 现象 | 原因与处理 |
+| --- | --- |
+| 还没开始下载就失败，提示 GitHub 不可达 | `git ls-remote` 连不上 GitHub。切换到 npm 镜像**没用**——镜像只提供 registry 包，不提供 Git 仓库。改用方式 3，或把 `pnpm pack` 生成的 tarball 放到可访问的位置再安装。 |
+| `already-installed` | profile 里已有同名的包。先卸载再装；版本切换就是"卸载 + 重装"。 |
+| 安装成功但看不到面板 | 页面跨过了插件加载。刷新一次即可。 |
+| 安装成功、bundle 加载了，但面板报错 | 浏览器控制台搜 `slot entry crashed`，连同 DSH 版本一起反馈。 |
+
+> 包名保留了 `@local/` 前缀，这是本地开发沿用的名字。从 GitHub 安装与解析都正常工作。若你打算发布到
+> npm，请同时修改 `package.json` 与 `cordis.patch.yml` 里的 `name`，然后重新安装。
 
 ## 快速上手
 

@@ -63,37 +63,74 @@ This plugin encodes one evidence chain instead:
 
 ## Install
 
-### From a checkout
+Pick whichever route matches how you use DSH. All three install the same bundle into your active profile.
 
-```bash
-git clone https://github.com/jiesudd/dsh-signal-figure-studio.git
-```
+### 1. From the Plugins page (no terminal)
 
-Then ask a Harness session to install the bundle from the absolute checkout path:
+1. In the DSH Web UI sidebar, open **Plugins**.
+2. Click **Add plugin**.
+3. Paste one of these specs into the package field:
 
-```
-plugin_manager { action: "install_bundle", target: "<absolute path to the checkout>" }
-```
+   ```
+   github:jiesudd/dsh-signal-figure-studio
+   ```
 
-The bundle is linked into the active profile, so later edits in the checkout take effect after a plugin
-reload. Installing from a checkout does not need Git.
+   ```
+   https://github.com/jiesudd/dsh-signal-figure-studio
+   ```
 
-### From GitHub
+4. Press **Install**. The dialog first reads what the spec names, then runs pnpm and shows its output.
+5. When it finishes, click **Enable now**.
+6. If the page was already open, refresh it once. The sidebar panel list then shows
+   **Signal figure studio**.
+
+Git must be on `PATH`: the manager runs `git ls-remote` against GitHub before it starts pnpm, so a
+machine without Git fails at that check rather than during the download.
+
+### 2. From an agent session
+
+Ask the Harness agent to install it, or call the tool directly:
 
 ```
 plugin_manager { action: "install_bundle", target: "github:jiesudd/dsh-signal-figure-studio" }
 ```
 
-The manager runs `git ls-remote` first, so Git must be on `PATH`. This plugin has no install scripts and
-declares no dependencies.
+### 3. From a checkout (development)
 
-### Then
+```bash
+git clone https://github.com/jiesudd/dsh-signal-figure-studio.git
+```
 
-Open the sidebar panel list and click **Signal figure studio**. If the page was open before installation,
-refresh it once.
+Then install from the absolute path:
 
-> The package name keeps the `@local/` scope because it is a locally linked bundle. If you publish to npm,
-> change the name to your own scope, update the `name` in `cordis.patch.yml`, and reinstall.
+```
+plugin_manager { action: "install_bundle", target: "<absolute path to the checkout>" }
+```
+
+The bundle is linked, not copied, so edits in the checkout take effect after a plugin reload. This route
+does **not** need Git on `PATH` at install time beyond the clone itself.
+
+### Requirements at a glance
+
+| Requirement | Why |
+| --- | --- |
+| A DSH installation with a managed profile | Bundles install into a profile |
+| Node.js ≥ 20 | The DSH runtime ships one |
+| Git on `PATH` | Only for the GitHub route (`git ls-remote` precheck) |
+| Nothing else | The plugin has no dependencies and no install scripts |
+
+### If the GitHub route fails
+
+| Symptom | Cause and fix |
+| --- | --- |
+| Fails before any download, mentions GitHub | `git ls-remote` could not reach GitHub. The npm mirror option does not help — a mirror serves registry packages, not Git repositories. Use route 3, or upload a `pnpm pack` tarball somewhere reachable and install that path. |
+| `already-installed` | A bundle with the same package name is already in the profile. Uninstall it first; reinstalling is how you move between versions. |
+| Install succeeds but no panel appears | The page was open across the plugin load. Refresh once. |
+| Install succeeds, bundle loads, panel throws | Check the browser console for `slot entry crashed`. Report it with the DSH version. |
+
+> The package name keeps the `@local/` scope, inherited from local development. It installs and resolves
+> correctly from GitHub. If you publish to npm instead, change `name` in `package.json` **and** in
+> `cordis.patch.yml` together, then reinstall.
 
 ## Quick start
 
